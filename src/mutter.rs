@@ -66,15 +66,15 @@ impl MutterSession {
         Ok(MutterSession { rd, sc_session, conn: conn.clone(), stream_path: None, node_rx: None, stream: None, started: false })
     }
 
-    /// Pide el stream del monitor primario ("" en la API de Mutter). Si no hay monitor
+    /// Pide el stream del monitor `connector` ("" = monitor primario en la API de Mutter). Si no hay monitor
     /// (o falla) usa un monitor virtual.
-    pub async fn record_monitor(&mut self, cursor_mode: u32) -> Result<()> {
+    pub async fn record_monitor(&mut self, cursor_mode: u32, connector: &str) -> Result<()> {
         if self.stream_path.is_some() {
             return Ok(());
         }
         let mut props: HashMap<&str, Value<'_>> = HashMap::new();
         props.insert("cursor-mode", Value::from(cursor_mode));
-        let path: OwnedObjectPath = match self.sc_session.call("RecordMonitor", &("", props.clone())).await {
+        let path: OwnedObjectPath = match self.sc_session.call("RecordMonitor", &(connector, props.clone())).await {
             Ok(p) => p,
             Err(e) => {
                 tracing::warn!("RecordMonitor fallo ({e}); se prueba RecordVirtual");

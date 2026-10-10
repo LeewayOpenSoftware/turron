@@ -1,29 +1,18 @@
-//! rdbridge: backend de xdg-desktop-portal (ScreenCast + RemoteDesktop) para GNOME.
+//! turrond: demonio de TURRON (backend de xdg-desktop-portal para GNOME).
 //!
-//! Cuando quien pide la captura es RustDesk, la sesion se crea sin dialogo con la API privada
-//! de Mutter (la misma que usa gnome-remote-desktop). Para cualquier otro programa las
-//! llamadas se reenvian tal cual al backend de GNOME (`xdg-desktop-portal-gnome`).
-
-mod caller;
-mod forward;
-mod mutter;
-mod remotedesktop;
-mod screencast;
-mod session;
-mod state;
+//! Aprueba sin dialogo SOLO a los ejecutables que el dueño autorizo con `turronctl allow`;
+//! todo lo demas se reenvia al backend de GNOME (dialogo normal).
 
 use anyhow::{Context, Result};
-use state::State;
 use std::sync::Arc;
+use turron::state::State;
+use turron::{control, policy, remotedesktop, screencast, BUS_NAME, CONTROL_PATH, OBJECT_PATH};
 use zbus::connection::Builder;
-
-pub const BUS_NAME: &str = "org.freedesktop.impl.portal.desktop.rdbridge";
-pub const OBJECT_PATH: &str = "/org/freedesktop/portal/desktop";
 
 #[tokio::main]
 async fn main() -> Result<()> {
     tracing_subscriber::fmt()
-        .with_env_filter(tracing_subscriber::EnvFilter::try_from_env("RDBRIDGE_LOG").unwrap_or_else(|_| "rdbridge=info".into()))
+        .with_env_filter(tracing_subscriber::EnvFilter::try_from_env("TURRON_LOG").unwrap_or_else(|_| "turron=info".into()))
         .with_writer(std::io::stderr)
         .init();
 
@@ -37,15 +26,21 @@ async fn main() -> Result<()> {
     let server = conn.object_server();
     server.at(OBJECT_PATH, screencast::ScreenCast::new(state.clone())).await?;
     server.at(OBJECT_PATH, remotedesktop::RemoteDesktop::new(state.clone())).await?;
+    server.at(CONTROL_PATH, control::Control { state: state.clone() }).await?;
     conn.request_name(BUS_NAME).await.with_context(|| format!("no se pudo registrar {BUS_NAME} (¿ya hay otra instancia?)"))?;
-    tracing::info!("rdbridge listo como {BUS_NAME}; permitidos: {:?}", caller::allowed_prefixes());
+
+    let path = policy::policy_path();
+    match policy::Policy::load(&path) {
+        Ok(p) => tracing::info!("turrond listo como {BUS_NAME}; politica {} con {} entrada(s) permitida(s)", path.display(), p.allow.len()),
+        Err(e) => tracing::warn!("turrond listo, pero la politica no es utilizable (todo se reenvia a GNOME): {e:#}"),
+    }
 
     let mut term = tokio::signal::unix::signal(tokio::signal::unix::SignalKind::terminate())?;
     tokio::select! {
         _ = tokio::signal::ctrl_c() => {}
         _ = term.recv() => {}
     }
-    tracing::info!("rdbridge terminando");
+    tracing::info!("turrond terminando");
     state.shutdown().await;
     Ok(())
 }

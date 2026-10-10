@@ -1,15 +1,33 @@
 [package]
-name = "rdbridge"
+name = "turron"
 version = "0.1.0"
 edition = "2021"
-description = "Backend de xdg-desktop-portal que aprueba sin dialogo a RustDesk usando la API privada de Mutter"
+description = "TURRON (Transparent User Remote Rendering & Output Negotiator): backend de xdg-desktop-portal para GNOME con consentimiento por politica explicita"
 license = "MIT"
+
+[lib]
+name = "turron"
+path = "src/lib.rs"
+
+[[bin]]
+name = "turrond"
+path = "src/bin/turrond.rs"
+
+[[bin]]
+name = "turronctl"
+path = "src/bin/turronctl.rs"
 
 [dependencies]
 anyhow = "1.0.104"
 futures-util = "0.3.34"
-serde = "1.0.229"
+md-5 = "0.11"
+serde = { version = "1.0.229", features = ["derive"] }
+sha2 = "0.11"
 tokio = { version = "1.53.2", features = ["rt-multi-thread", "macros", "time", "sync", "signal"] }
+toml = "1"
 tracing = "0.1.44"
 tracing-subscriber = { version = "0.3.23", features = ["env-filter"] }
-zbus = { version = "5.19.0", default-features = false, features = ["tokio"] }
+zbus = { version = "5.19.0", default-features = false, features = ["tokio", "blocking-api"] }
+
+[dev-dependencies]
+tempfile = "3"

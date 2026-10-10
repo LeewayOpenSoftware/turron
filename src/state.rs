@@ -13,8 +13,21 @@ pub enum Kind {
     Forward,
 }
 
+/// Datos de la sesion para `turronctl status`.
+#[derive(Debug, Clone)]
+pub struct SessionInfo {
+    /// Entrada de la politica que la aprobo (o "gnome" si la maneja el backend de GNOME).
+    pub name: String,
+    pub pid: u32,
+    pub exe: String,
+    pub since: u64,
+}
+
 pub struct Entry {
     pub kind: Kind,
+    pub info: SessionInfo,
+    /// Conector de monitor fijado por la politica (None = primario).
+    pub monitor: Option<String>,
     /// `persist_mode` pedido en SelectSources/SelectDevices (0 = no persistir).
     pub persist_mode: Mutex<u32>,
     /// Tipos de dispositivo pedidos en SelectDevices (para informarlos en Start).
@@ -33,8 +46,8 @@ impl State {
         State { conn, sessions: Mutex::new(HashMap::new()) }
     }
 
-    pub async fn insert(&self, handle: &str, kind: Kind) -> Arc<Entry> {
-        let entry = Arc::new(Entry { kind, persist_mode: Mutex::new(0), device_types: Mutex::new(7), cursor_mode: Mutex::new(None) });
+    pub async fn insert(&self, handle: &str, kind: Kind, info: SessionInfo, monitor: Option<String>) -> Arc<Entry> {
+        let entry = Arc::new(Entry { kind, info, monitor, persist_mode: Mutex::new(0), device_types: Mutex::new(7), cursor_mode: Mutex::new(None) });
         self.sessions.lock().await.insert(handle.to_owned(), entry.clone());
         entry
     }
@@ -45,6 +58,10 @@ impl State {
 
     pub async fn remove(&self, handle: &str) -> Option<Arc<Entry>> {
         self.sessions.lock().await.remove(handle)
+    }
+
+    pub async fn list(&self) -> Vec<(String, SessionInfo, bool)> {
+        self.sessions.lock().await.iter().map(|(h, e)| (h.clone(), e.info.clone(), matches!(e.kind, Kind::Mutter(_)))).collect()
     }
 
     /// Cierra las sesiones de Mutter abiertas (al terminar el servicio).

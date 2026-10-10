@@ -1,0 +1,4 @@
+[D-BUS Service]
+Name=org.freedesktop.impl.portal.desktop.turron
+Exec=@HOME@/.local/bin/turrond
+SystemdService=turrond.service
