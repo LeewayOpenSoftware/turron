@@ -7,9 +7,9 @@ use tokio::sync::Mutex;
 use zbus::Connection;
 
 pub enum Kind {
-    /// Sesion creada por rdbridge con la API de Mutter (llamador aprobado).
+    /// Sesion creada por turron con la API de Mutter (llamador aprobado).
     Mutter(Mutex<MutterSession>),
-    /// Sesion que vive en el backend de GNOME; rdbridge solo reenvia.
+    /// Sesion que vive en el backend de GNOME; turron solo reenvia.
     Forward,
 }
 

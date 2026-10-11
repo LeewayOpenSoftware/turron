@@ -77,7 +77,7 @@ fn stream_value(s: &StreamInfo) -> Value<'static> {
 }
 
 /// Resultados de Start: `streams` (a(ua{sv})) y, si se pidio, los datos de persistencia.
-/// `restore_data` no guarda nada util (rdbridge nunca pregunta) pero hace que el portal
+/// `restore_data` no guarda nada util (turron nunca pregunta) pero hace que el portal
 /// entregue un `restore_token` y la aplicacion no vuelva a pedir permiso.
 pub fn start_results(streams: &[StreamInfo], persist_mode: u32) -> HashMap<String, OwnedValue> {
     let mut out: HashMap<String, OwnedValue> = HashMap::new();
@@ -97,7 +97,7 @@ pub fn start_results(streams: &[StreamInfo], persist_mode: u32) -> HashMap<Strin
         if let Ok(v) = OwnedValue::try_from(Value::from(persist_mode)) {
             out.insert("persist_mode".into(), v);
         }
-        let data = StructureBuilder::new().add_field("rdbridge").add_field(1u32).add_field(Value::from("primary")).build();
+        let data = StructureBuilder::new().add_field("turron").add_field(1u32).add_field(Value::from("primary")).build();
         if let Ok(data) = data {
             if let Ok(v) = OwnedValue::try_from(Value::from(data)) {
                 out.insert("restore_data".into(), v);

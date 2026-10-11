@@ -60,3 +60,7 @@ También limpia restos del nombre anterior (rdbridge).
 ## Pruebas
 
 `cargo test`: política (sin allowlist reenvía, con allowlist aprueba, hash cambiado vuelve a pedir, actualización de paquete verificada por dpkg, deny/revoke, permisos 600), identificación del llamador. Verificado en un GNOME 50 real: sesión sin diálogo, frames de PipeWire, input, reenvío a GNOME y `turronctl status/cut`.
+
+## Licencia y autoría
+
+TURRON es parte de **Leeway Open Software** y se distribuye bajo licencia MIT (ver `LICENSE`).

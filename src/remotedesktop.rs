@@ -177,7 +177,7 @@ impl RemoteDesktop {
                     .map_err(|e| fdo::Error::Failed(format!("backend de GNOME: {e}")))?;
                 reply.body().deserialize::<zbus::zvariant::OwnedFd>().map_err(|e| fdo::Error::Failed(e.to_string()))
             }
-            _ => Err(fdo::Error::NotSupported("ConnectToEIS no esta disponible en sesiones de rdbridge".into())),
+            _ => Err(fdo::Error::NotSupported("ConnectToEIS no esta disponible en sesiones de turron".into())),
         }
     }
 }

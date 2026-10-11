@@ -4,6 +4,8 @@ version = "0.1.0"
 edition = "2021"
 description = "TURRON (Transparent User Remote Rendering & Output Negotiator): backend de xdg-desktop-portal para GNOME con consentimiento por politica explicita"
 license = "MIT"
+authors = ["Leeway Open Software"]
+repository = "https://github.com/LeewayOpenSoftware/turron"
 
 [lib]
 name = "turron"
