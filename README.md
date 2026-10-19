@@ -1,6 +1,6 @@
-# TURRON — Transparent User Remote Rendering & Output Negotiator
+# TURRON: Transparent User Remote Rendering & Output Negotiator
 
-Backend de **xdg-desktop-portal** en Rust (zbus + tokio, sin librerías `-dev` de sistema) para GNOME en Wayland. Permite que un programa de escritorio remoto (hoy RustDesk) capture la pantalla y mande input **sin el diálogo del portal**, por ejemplo en un equipo sin monitor (con dongle HDMI) donde nadie puede aceptarlo — **pero solo si el dueño lo autorizó de forma explícita**. No toca ni recompila RustDesk, así que sobrevive a sus actualizaciones.
+Backend de **xdg-desktop-portal** en Rust (zbus + tokio, sin librerías `-dev` de sistema) para GNOME en Wayland. Permite que un programa de escritorio remoto (hoy RustDesk) capture la pantalla y mande input **sin el diálogo del portal**, por ejemplo en un equipo sin monitor (con dongle HDMI) donde nadie puede aceptarlo  **pero solo si el dueño lo autorizó de forma explícita**. No toca ni recompila RustDesk, así que sobrevive a sus actualizaciones.
 
 ## Consentimiento: política explícita del dueño
 
